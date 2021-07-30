@@ -1,0 +1,10 @@
+### create new user
+POST http://localhost:5000/api/user/sign-up HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Lee Stratman",
+    "email": "lee@stratman1.org",
+    "phone": "+123456789",
+    "password": "bestpwdever"
+}
