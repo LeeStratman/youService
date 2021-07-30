@@ -106,3 +106,4 @@ dist
 /config.codekit3
 
 .DS_Store
+rest.http
