@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { hashPassword } = require("../helpers/password_hash");
+const { hashPassword, comparePassword } = require("../helpers/password_hash");
 const User = require("../models/user");
 
 //User sign up
@@ -36,15 +36,15 @@ router.post("/log-in", async (req, res) => {
     if (!user) {
       return res
         .status(400)
-        .json({ status: "error", message: "Invalid username" });
+        .json({ status: "error", message: "Invalid username or password" });
     }
 
-    const valid = user.password === req.body.password;
+    const valid = await comparePassword(user.password, req.body.password);
 
     if (!valid) {
       return res
         .status(400)
-        .json({ status: "error", message: "Invalid password" });
+        .json({ status: "error", message: "Invalid username or password" });
     }
 
     return res
