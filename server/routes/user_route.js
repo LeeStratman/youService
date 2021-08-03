@@ -19,4 +19,31 @@ router.post("/sign-up", async (req, res) => {
   }
 });
 
+// User log in
+router.post("/log-in", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email }).exec();
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Invalid username" });
+    }
+
+    const valid = user.password === req.body.password;
+
+    if (!valid) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Invalid password" });
+    }
+
+    return res
+      .status(200)
+      .json({ status: "success", message: "Successfully signed in" });
+  } catch (error) {
+    res.json({ status: "error", message: error.message });
+  }
+});
+
 module.exports = router;
