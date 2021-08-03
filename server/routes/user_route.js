@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const { hashPassword } = require("../helpers/password_hash");
 const User = require("../models/user");
 
 //User sign up
 router.post("/sign-up", async (req, res) => {
+  const { password } = req.body;
   try {
     let user = await User.find({ email: req.body.email }).lean().exec();
 
@@ -11,9 +13,16 @@ router.post("/sign-up", async (req, res) => {
       return res.json({ status: "error", message: "user already exists" });
     }
 
-    user = await User.create(req.body);
+    const hashedPwd = await hashPassword(password);
+    const newUserObj = { ...req.body, password: hashedPwd };
 
-    return res.json({ status: "success", message: "account has been created" });
+    user = await User.create(newUserObj);
+
+    return res.json({
+      status: "success",
+      message: "account has been created",
+      user,
+    });
   } catch (error) {
     return res.json({ status: "error", message: error.message });
   }
