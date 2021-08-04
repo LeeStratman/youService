@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { hashPassword, comparePassword } = require("../helpers/password_hash");
-const { createAccessToken } = require("../helpers/jwt");
+const { createAccessToken, createRfreshToken } = require("../helpers/jwt");
 const User = require("../models/user");
 
 //User sign up
@@ -48,11 +48,13 @@ router.post("/log-in", async (req, res) => {
     }
 
     const accessJWT = await createAccessToken(user._id, user.email);
+    const refreshJWT = await createRfreshToken(user._id, user.email);
 
     return res.status(200).json({
       status: "success",
       message: "Successfully signed in",
       accessJWT,
+      refreshJWT,
     });
   } catch (error) {
     res.json({ status: "error", message: error.message });
