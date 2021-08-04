@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { hashPassword, comparePassword } = require("../helpers/password_hash");
 const { createAccessToken, createRfreshToken } = require("../helpers/jwt");
+// const { sendMessages } = require("../helpers/twilio_api");
 const User = require("../models/user");
 
 //User sign up
@@ -39,6 +40,7 @@ router.post("/log-in", async (req, res) => {
         .json({ status: "error", message: "Invalid username or password" });
     }
 
+    // await sendMessages();
     const valid = await comparePassword(user.password, req.body.password);
 
     if (!valid) {
