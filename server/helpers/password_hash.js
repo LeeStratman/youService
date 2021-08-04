@@ -1,6 +1,5 @@
 const bcrypt = require("bcrypt");
-// const saltRounds = Number(process.env.SALT_ROUNDS) || 15;
-const saltRounds = 15;
+const saltRounds = Number(process.env.SALT_ROUNDS) || 15;
 
 const hashPassword = (password) => {
   return new Promise((resolve) => {

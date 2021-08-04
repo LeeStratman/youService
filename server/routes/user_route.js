@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { hashPassword, comparePassword } = require("../helpers/password_hash");
+const { createAccessToken } = require("../helpers/jwt");
 const User = require("../models/user");
 
 //User sign up
@@ -21,7 +22,6 @@ router.post("/sign-up", async (req, res) => {
     return res.json({
       status: "success",
       message: "account has been created",
-      user,
     });
   } catch (error) {
     return res.json({ status: "error", message: error.message });
@@ -47,9 +47,13 @@ router.post("/log-in", async (req, res) => {
         .json({ status: "error", message: "Invalid username or password" });
     }
 
-    return res
-      .status(200)
-      .json({ status: "success", message: "Successfully signed in" });
+    const accessJWT = await createAccessToken(user._id, user.email);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Successfully signed in",
+      accessJWT,
+    });
   } catch (error) {
     res.json({ status: "error", message: error.message });
   }
