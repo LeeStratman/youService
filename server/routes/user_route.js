@@ -4,7 +4,10 @@ const { hashPassword, comparePassword } = require("../helpers/password_hash");
 const { createAccessToken, createRfreshToken } = require("../helpers/jwt");
 const User = require("../models/user");
 const { sendMessage } = require("../helpers/twilio_api");
-const randomNumGenerator = require("../helpers/random_num_gen");
+const {
+  generateVerificationPin,
+} = require("../models/verification_pin/verification_pin_model");
+const pinLength = process.env.VERIIFICATION_PIN_LENGTH;
 
 //User sign up
 router.post("/sign-up", async (req, res) => {
@@ -21,11 +24,8 @@ router.post("/sign-up", async (req, res) => {
 
     user = await User.create(newUserObj);
 
-    // generate verificatiion code
-    const code = randomNumGenerator(6);
-
-    //send verification code
-    // sendMessage(`Hi ${user.name},\nHere is your verification code:\n\n${code}`);
+    const pin = await generateVerificationPin(user);
+    console.log(pin);
 
     return res.json({
       status: "success",
@@ -47,8 +47,6 @@ router.post("/log-in", async (req, res) => {
         .status(400)
         .json({ status: "error", message: "Invalid username or password" });
     }
-
-    // sendMessages("Twiilio baptism");
 
     const valid = await comparePassword(user.password, req.body.password);
 
