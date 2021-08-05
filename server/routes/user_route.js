@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { hashPassword, comparePassword } = require("../helpers/password_hash");
 const { createAccessToken, createRfreshToken } = require("../helpers/jwt");
-const User = require("../models/user");
+const User = require("../models/user/user");
 const {
   generateVerificationPin,
   verifyPin,
