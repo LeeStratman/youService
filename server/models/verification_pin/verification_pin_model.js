@@ -38,7 +38,18 @@ const verifyPin = (email, pin) => {
   });
 };
 
+const deleteVerificationPin = async (email, pin) => {
+  try {
+    await VerificationPin.findOneAndDelete({ email, pin }, (error) => {
+      error && console.log(error);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   generateVerificationPin,
   verifyPin,
+  deleteVerificationPin,
 };

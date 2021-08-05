@@ -7,6 +7,7 @@ const { verifyUser } = require("../models/user/user_model");
 const {
   generateVerificationPin,
   verifyPin,
+  deleteVerificationPin,
 } = require("../models/verification_pin/verification_pin_model");
 
 //User sign up
@@ -54,10 +55,16 @@ router.patch("/verify", async (req, res) => {
       new Date() < result.created_at.setDate(result.created_at.getDate() + 1);
 
     if (!isPinValid) {
+      // Delete pin from DB since it is expired
+      deleteVerificationPin(email, pin);
       return res.status(400).json({ status: "error", message: "Expired pin" });
     }
 
     const verifiedUser = await verifyUser(result);
+
+    // Delete pin from DB once pin has been used
+    await deleteVerificationPin(email, pin);
+
     const { _id, name, phone } = verifiedUser;
 
     res.json({
