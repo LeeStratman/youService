@@ -40,7 +40,26 @@ router.post("/sign-up", async (req, res) => {
 router.patch("/verify", async (req, res) => {
   try {
     const { email, pin } = req.body;
-  } catch (error) {}
+
+    const result = await verifyPin(email, pin);
+
+    if (!result._id) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Invalid email or pin" });
+    }
+
+    const isPinValid =
+      new Date() < result.created_at.setDate(result.created_at.getDate() + 1);
+
+    if (!isPinValid) {
+      return res.status(400).json({ status: "error", message: "Expired pin" });
+    }
+
+    res.json({ valid: isPinValid, result });
+  } catch (error) {
+    return res.json({ status: "error", message: error.message });
+  }
 });
 
 // User log in
