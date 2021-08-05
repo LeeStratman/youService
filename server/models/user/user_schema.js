@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     password: { type: String, required: true, minlength: 8, trim: true },
-    phone: { type: String, required: true },
+    phone: { type: String, minlength: 6, required: true },
     refresh_token: {
       token: {
         type: String,
