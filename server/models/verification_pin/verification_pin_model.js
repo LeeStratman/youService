@@ -25,6 +25,20 @@ const generateVerificationPin = ({ email, name, phone }) => {
   });
 };
 
+const verifyPin = (email, pin) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await VerificationPin.findOne({ email, pin }, (err, res) => {
+        err && reject(false);
+        resolve(res);
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   generateVerificationPin,
+  verifyPin,
 };

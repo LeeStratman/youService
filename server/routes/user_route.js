@@ -3,11 +3,10 @@ const router = express.Router();
 const { hashPassword, comparePassword } = require("../helpers/password_hash");
 const { createAccessToken, createRfreshToken } = require("../helpers/jwt");
 const User = require("../models/user");
-const { sendMessage } = require("../helpers/twilio_api");
 const {
   generateVerificationPin,
+  verifyPin,
 } = require("../models/verification_pin/verification_pin_model");
-const pinLength = process.env.VERIIFICATION_PIN_LENGTH;
 
 //User sign up
 router.post("/sign-up", async (req, res) => {
@@ -35,6 +34,13 @@ router.post("/sign-up", async (req, res) => {
   } catch (error) {
     return res.json({ status: "error", message: error.message });
   }
+});
+
+// New user verification
+router.patch("/verify", async (req, res) => {
+  try {
+    const { email, pin } = req.body;
+  } catch (error) {}
 });
 
 // User log in
