@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 const pinLength = process.env.VERIIFICATION_PIN_LENGTH;
 
 const VerificationPinSchema = new Schema({
+  user_id: {
+    type: Schema.Types.ObjectId,
+  },
   pin: {
     type: String,
     min: pinLength,

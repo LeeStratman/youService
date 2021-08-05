@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { hashPassword, comparePassword } = require("../helpers/password_hash");
 const { createAccessToken, createRfreshToken } = require("../helpers/jwt");
-const User = require("../models/user/user");
+const User = require("../models/user/user_schema");
+const { verifyUser } = require("../models/user/user_model");
 const {
   generateVerificationPin,
   verifyPin,
@@ -56,7 +57,14 @@ router.patch("/verify", async (req, res) => {
       return res.status(400).json({ status: "error", message: "Expired pin" });
     }
 
-    res.json({ valid: isPinValid, result });
+    const verifiedUser = await verifyUser(result);
+    const { _id, name, phone } = verifiedUser;
+
+    res.json({
+      status: "success",
+      message: "Your account has been verified",
+      result: { _id, name, email, phone },
+    });
   } catch (error) {
     return res.json({ status: "error", message: error.message });
   }

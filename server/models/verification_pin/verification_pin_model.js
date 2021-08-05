@@ -4,7 +4,7 @@ const randomNumGenerator = require("../../helpers/random_num_gen");
 const pinLength = process.env.VERIIFICATION_PIN_LENGTH;
 
 // generate verificatiion code
-const generateVerificationPin = ({ email, name, phone }) => {
+const generateVerificationPin = ({ email, name, phone, _id: user_id }) => {
   return new Promise(async (resolve, reject) => {
     try {
       const pin = randomNumGenerator(pinLength);
@@ -15,7 +15,7 @@ const generateVerificationPin = ({ email, name, phone }) => {
         phone
       );
 
-      await VerificationPin({ email, pin })
+      await VerificationPin({ email, pin, user_id })
         .save()
         .then((data) => resolve(data))
         .catch((err) => reject(err));
