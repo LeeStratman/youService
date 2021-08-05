@@ -2,7 +2,12 @@ const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
 const { hashPassword, comparePassword } = require("../helpers/password_hash");
-const User = require("../models/user");
+const { createAccessToken, createRfreshToken } = require("../helpers/jwt");
+const User = require("../models/user/user");
+const {
+  generateVerificationPin,
+  verifyPin,
+} = require("../models/verification_pin/verification_pin_model");
 
 //User sign up
 router.post("/sign-up", async (req, res) => {
@@ -28,11 +33,40 @@ router.post("/sign-up", async (req, res) => {
 
     user = await User.create(newUserObj);
 
+    const pin = await generateVerificationPin(user);
+    console.log(pin);
+
     return res.json({
       status: "success",
-      message: "account has been created",
-      user,
+      message:
+        "Account has been created. Complete account set up with verification code sent to your phone number",
     });
+  } catch (error) {
+    return res.json({ status: "error", message: error.message });
+  }
+});
+
+// New user verification
+router.patch("/verify", async (req, res) => {
+  try {
+    const { email, pin } = req.body;
+
+    const result = await verifyPin(email, pin);
+
+    if (!result._id) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Invalid email or pin" });
+    }
+
+    const isPinValid =
+      new Date() < result.created_at.setDate(result.created_at.getDate() + 1);
+
+    if (!isPinValid) {
+      return res.status(400).json({ status: "error", message: "Expired pin" });
+    }
+
+    res.json({ valid: isPinValid, result });
   } catch (error) {
     return res.json({ status: "error", message: error.message });
   }
@@ -57,9 +91,15 @@ router.post("/log-in", async (req, res) => {
         .json({ status: "error", message: "Invalid username or password" });
     }
 
-    return res
-      .status(200)
-      .json({ status: "success", message: "Successfully signed in" });
+    const accessJWT = await createAccessToken(user._id, user.email);
+    const refreshJWT = await createRfreshToken(user._id, user.email);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Successfully signed in",
+      accessJWT,
+      refreshJWT,
+    });
   } catch (error) {
     res.json({ status: "error", message: error.message });
   }
