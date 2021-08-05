@@ -5,14 +5,16 @@ const to = process.env.DESTINATION_NUM;
 
 const client = require("twilio")(accountSid, authToken);
 
-const sendMessages = client.messages
-  .create({
-    body: "This is my baptism into TWILIO API",
-    from,
-    to,
-  })
-  .then((message) => console.log(message))
-  .catch((error) => console.log(error));
+const sendMessages = (body) => {
+  client.messages
+    .create({
+      body,
+      from,
+      to,
+    })
+    .then((message) => console.log(message))
+    .catch((error) => console.log(error));
+};
 
 module.exports = {
   sendMessages,
