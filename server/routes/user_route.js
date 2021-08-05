@@ -1,13 +1,23 @@
 const express = require("express");
 const router = express.Router();
+const Joi = require("joi");
 const { hashPassword, comparePassword } = require("../helpers/password_hash");
 const User = require("../models/user");
 
 //User sign up
 router.post("/sign-up", async (req, res) => {
-  const { password } = req.body;
+  const { error } = validateUser(req.body);
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ status: "error", message: error.details[0].message });
+  }
+
+  const { password, email } = req.body;
+
   try {
-    let user = await User.find({ email: req.body.email }).lean().exec();
+    let user = await User.find({ email }).lean().exec();
 
     if (user.length > 0) {
       return res.json({ status: "error", message: "user already exists" });
@@ -54,5 +64,19 @@ router.post("/log-in", async (req, res) => {
     res.json({ status: "error", message: error.message });
   }
 });
+
+function validateUser(user) {
+  const schema = Joi.object({
+    name: Joi.string().min(5).max(100).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(8).required(),
+    phone: Joi.string()
+      .min(6)
+      .pattern(/^[0-9]+$/)
+      .required(),
+  });
+
+  return schema.validate(user);
+}
 
 module.exports = router;
