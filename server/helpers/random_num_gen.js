@@ -7,3 +7,5 @@ const randomNumGenerator = (length) => {
   }
   return randomNum;
 };
+
+module.exports = randomNumGenerator;

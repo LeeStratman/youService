@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { hashPassword, comparePassword } = require("../helpers/password_hash");
 const { createAccessToken, createRfreshToken } = require("../helpers/jwt");
-const { sendMessages } = require("../helpers/twilio_api");
 const User = require("../models/user");
+const { sendMessage } = require("../helpers/twilio_api");
+const randomNumGenerator = require("../helpers/random_num_gen");
 
 //User sign up
 router.post("/sign-up", async (req, res) => {
@@ -20,9 +21,16 @@ router.post("/sign-up", async (req, res) => {
 
     user = await User.create(newUserObj);
 
+    // generate verificatiion code
+    const code = randomNumGenerator(6);
+
+    //send verification code
+    // sendMessage(`Hi ${user.name},\nHere is your verification code:\n\n${code}`);
+
     return res.json({
       status: "success",
-      message: "account has been created",
+      message:
+        "Account has been created. Complete account set up with verification code sent to your phone number",
     });
   } catch (error) {
     return res.json({ status: "error", message: error.message });
