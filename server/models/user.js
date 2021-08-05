@@ -14,7 +14,24 @@ const userSchema = new mongoose.Schema(
     },
     password: { type: String, required: true, minlength: 8, trim: true },
     phone: { type: String, required: true },
+    refresh_token: {
+      token: {
+        type: String,
+        default: "",
+      },
+      added_at: {
+        type: Date,
+        required: true,
+        default: Date.now(),
+      },
+    },
+    is_verified: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
+
   { timestamps: true }
 );
 
