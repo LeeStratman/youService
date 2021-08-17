@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const foodSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  categories: [],
+  categories: [String],
 });
 
 const Food = mongoose.model("Food", foodSchema);
